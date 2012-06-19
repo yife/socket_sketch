@@ -56,6 +56,12 @@ li {
 <input type="button" id="save" value="保存" />
 <input type="button" id="clear" value="消去" />
 </div>
+
+<div>
+    <p>あなたのIDは: 
+        <span id='connectId'></span>
+    </p>
+</div>
  
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
@@ -67,6 +73,17 @@ $(function() {
     var drawFlag = false;
     var context = $("canvas").get(0).getContext('2d');
     var socket = io.connect('http://localhost');
+    var socket_id;
+
+    //自分のidを表示
+    console.log(socket);
+    socket.on('your_id', function(data){
+        console.log(data);
+        $('#connectId').text(data);
+        //自分のidを覚えておく。（あとでメッセージ送信時に自分のidをくっつけて送る）
+        socket_id = data;
+    });
+
  
     // サーバからメッセージ受信
     socket.on('send user', function (msg) {
@@ -125,7 +142,7 @@ $(function() {
         context.closePath();
  
         // サーバへメッセージ送信
-        socket.emit('server send', { fx:fromX, fy:fromY, tx:toX, ty:toY, color:context.strokeStyle });
+        socket.emit('server send', { fx:fromX, fy:fromY, tx:toX, ty:toY, color:context.strokeStyle, socket_id: socket_id });
         fromX = toX;
         fromY = toY;
     }
